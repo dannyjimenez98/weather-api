@@ -9,14 +9,20 @@ import (
 )
 
 func main() {
-
 	if err := godotenv.Load(".env"); err != nil {
-		log.Fatalf("error loading .env from the working directory (run from the project root): %v", err)
+		log.Fatalf("error loading .env: %v\n", err)
 	}
 
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("/weather/data", api.GetWeatherData)
+	// get location's weather data for today
+	mux.HandleFunc("/{location}/today", api.GetWeatherToday)
+
+	// get location's weather data for today
+	mux.HandleFunc("/{location}/{date}", api.GetWeatherOnDate)
+
+	// get location's weather data for today
+	mux.HandleFunc("/{location}/{startDate}/{endDate}", api.GetWeatherBetweenDates)
 
 	log.Fatal(http.ListenAndServe(":8080", mux))
 }

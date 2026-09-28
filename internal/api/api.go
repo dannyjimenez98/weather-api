@@ -3,37 +3,75 @@ package api
 import (
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"os"
-	"time"
 )
 
-// GetWeatherData sends a request to the 3rd party weather api
-// and writes the returned data to the response of this endpoint
-func GetWeatherData(w http.ResponseWriter, r *http.Request) {
-	baseURL := "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/"
-	location := "10121" // NYC zipcode
-
-	apiKey := os.Getenv("API_KEY")
-	todaysDate := time.Now().Format("2006-01-02")
-
-	// endpoint returns weather data for today only
-	url := fmt.Sprintf("%s%s/%s?unitGroup=us&include=days&key=%s", baseURL, location, todaysDate, apiKey)
-
+// getWeatherData sends request to 3rd party weather api and returns body of response
+func getWeatherData(w http.ResponseWriter, url string) []byte {
 	resp, err := http.Get(url)
 	if err != nil {
-		log.Fatalf("error getting response: %v\n", err)
+		http.Error(w, "error getting response: "+err.Error(), http.StatusBadGateway)
+		return nil
 	}
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		log.Fatalf("error reading response body: %v\n", err)
+		http.Error(w, "error reading response body: "+err.Error(), http.StatusBadGateway)
+		return nil
 	}
-	resp.Body.Close()
+	defer resp.Body.Close()
 	if resp.StatusCode > 299 {
-		log.Fatalf("Response failed with status code: %d and\nbody: %s\n", resp.StatusCode, body)
+		errorMessage := fmt.Sprintf("response failed: %v\nbody: %v", err, body)
+		http.Error(w, errorMessage, resp.StatusCode)
+		return nil
 	}
+
+	return body
+}
+
+// GetWeatherToday returns response with location's weather data for today
+func GetWeatherToday(w http.ResponseWriter, r *http.Request) {
+	baseURL := "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/"
+	location := r.PathValue("location")
+	apiKey := os.Getenv("API_KEY")
+
+	url := baseURL + location + "/today?unitGroup=us&include=days&key=" + apiKey
+
+	body := getWeatherData(w, url)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(body)
+}
+
+// GetWeatherOnDate returns response with location's weather data for requested date
+func GetWeatherOnDate(w http.ResponseWriter, r *http.Request) {
+	baseURL := "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/"
+	location := r.PathValue("location")
+	date := r.PathValue("date")
+
+	apiKey := os.Getenv("API_KEY")
+
+	url := baseURL + location + "/" + date + "?unitGroup=us&include=days&key=" + apiKey
+
+	body := getWeatherData(w, url)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(body)
+}
+
+// GetWeatherBetweenDates returns response with location's weather data for date range
+func GetWeatherBetweenDates(w http.ResponseWriter, r *http.Request) {
+	baseURL := "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/"
+	location := r.PathValue("location")
+	startDate := r.PathValue("startDate")
+	endDate := r.PathValue("endDate")
+
+	apiKey := os.Getenv("API_KEY")
+
+	url := baseURL + location + "/" + startDate + "/" + endDate + "?unitGroup=us&include=days&key=" + apiKey
+
+	body := getWeatherData(w, url)
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(body)
