@@ -4,7 +4,9 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/dannyjimenez98/weather-api.git/internal/api"
+	"github.com/dannyjimenez98/weather-api.git/internal/handlers"
+	"github.com/go-chi/chi"
+
 	"github.com/joho/godotenv"
 )
 
@@ -13,16 +15,12 @@ func main() {
 		log.Fatalf("error loading .env: %v\n", err)
 	}
 
-	mux := http.NewServeMux()
 
-	// get location's weather data for today
-	mux.HandleFunc("/{location}/today", api.GetWeatherToday)
 
-	// get location's weather data for today
-	mux.HandleFunc("/{location}/{date}", api.GetWeatherOnDate)
 
-	// get location's weather data for today
-	mux.HandleFunc("/{location}/{startDate}/{endDate}", api.GetWeatherBetweenDates)
+	// http routing
+	r := chi.NewRouter()
+	handlers.Handler(r)
 
-	log.Fatal(http.ListenAndServe(":8080", mux))
+	log.Fatal(http.ListenAndServe(":8080", r))
 }
