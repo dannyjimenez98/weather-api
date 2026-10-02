@@ -26,5 +26,7 @@ func FetchWeatherData(w http.ResponseWriter, url string) []byte {
 		return nil
 	}
 
+	fmt.Println("Data from 3rd Party API was fetched successfully")
+
 	return body
 }
