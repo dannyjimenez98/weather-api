@@ -4,25 +4,20 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/dannyjimenez98/weather-api.git/internal/api"
-	"github.com/joho/godotenv"
+	"github.com/dannyjimenez98/weather-api.git/internal/cache"
+	"github.com/dannyjimenez98/weather-api.git/internal/env"
+	"github.com/dannyjimenez98/weather-api.git/internal/handlers"
+	"github.com/go-chi/chi"
 )
 
 func main() {
-	if err := godotenv.Load(".env"); err != nil {
-		log.Fatalf("error loading .env: %v\n", err)
-	}
+	env.Load()
+	rdb := cache.Connect()
+	defer rdb.Close()
 
-	mux := http.NewServeMux()
+	// http routing
+	r := chi.NewRouter()
+	handlers.Handler(r, rdb)
 
-	// get location's weather data for today
-	mux.HandleFunc("/{location}/today", api.GetWeatherToday)
-
-	// get location's weather data for today
-	mux.HandleFunc("/{location}/{date}", api.GetWeatherOnDate)
-
-	// get location's weather data for today
-	mux.HandleFunc("/{location}/{startDate}/{endDate}", api.GetWeatherBetweenDates)
-
-	log.Fatal(http.ListenAndServe(":8080", mux))
+	log.Fatal(http.ListenAndServe(":8080", r))
 }
