@@ -12,12 +12,13 @@ import (
 
 func main() {
 	env.Load()
+
 	rdb := cache.Connect()
 	defer rdb.Close()
 
 	// http routing
 	r := chi.NewRouter()
-	handlers.Handler(r, rdb)
+	handlers.RegisterRoutes(r, rdb)
 
 	log.Fatal(http.ListenAndServe(":8080", r))
 }
