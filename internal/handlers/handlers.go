@@ -9,7 +9,7 @@ import (
 
 	"github.com/dannyjimenez98/weather-api.git/internal/client"
 	"github.com/dannyjimenez98/weather-api.git/internal/env"
-	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/redis/go-redis/v9"
 )

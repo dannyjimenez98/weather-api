@@ -7,7 +7,7 @@ import (
 	"github.com/dannyjimenez98/weather-api.git/internal/cache"
 	"github.com/dannyjimenez98/weather-api.git/internal/env"
 	"github.com/dannyjimenez98/weather-api.git/internal/handlers"
-	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/v5"
 )
 
 func main() {
