@@ -32,7 +32,6 @@ func handleData(rdb *redis.Client) http.HandlerFunc {
 		}
 
 		ctx := r.Context()
-
 		responseBody, err := weather.GetWeatherResponse(ctx, &params, rdb)
 		if err != nil {
 			http.Error(w, "could not retrieve weather data", http.StatusBadGateway)
