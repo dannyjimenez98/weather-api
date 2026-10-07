@@ -3,7 +3,6 @@ module github.com/dannyjimenez98/weather-api.git
 go 1.27.1
 
 require (
-	github.com/go-chi/chi v1.5.5
 	github.com/go-chi/chi/v5 v5.3.2
 	github.com/joho/godotenv v1.5.1
 	github.com/redis/go-redis/v9 v9.22.0
