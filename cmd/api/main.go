@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -15,7 +14,7 @@ import (
 
 func main() {
 	if err := start(); err != nil {
-		log.Fatal("http server disconnected: %v", err)
+		log.Fatalf("http server disconnected: %v", err)
 	}
 }
 
